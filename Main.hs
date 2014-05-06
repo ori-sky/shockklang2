@@ -17,24 +17,38 @@ data Env = Env
 
 defaultEnv = Env
     { vars      = M.empty
-    , result    = AST.Num 0
+    , result    = AST.Undefined
     }
 
 runASTs :: Env -> [AST.AST] -> AST.AST
 runASTs env [] = result env
 runASTs env (ast:asts) = runASTs (runAST env ast) asts
 
-runAST :: Env -> AST.AST -> Env
-runAST env (AST.Scope asts) = env {result=runASTs env asts}
-runAST env (AST.Num x) = env {result=AST.Num x}
-runAST env (AST.Identifier id) = env {result=r}
+runLambda :: Env -> AST.AST -> AST.AST
+runLambda env (AST.Lambda args ast applied) = result (runAST e ast)
+  where vs = M.union (M.fromList (zip args applied)) (vars env)
+        e = env {vars=vs, result=AST.Undefined}
+runLambda _ _ = error "runtime: not a lambda"
+
+runAST' :: Env -> AST.AST -> Env
+runAST' env (AST.Scope asts) = env {result=runASTs env asts}
+runAST' env (AST.Num x) = env {result=AST.Num x}
+runAST' env (AST.Identifier id) = env {result=r}
   where r = case M.lookup id (vars env) of
             Just ast -> ast
-            Nothing  -> error "runtime: Undefined"
-runAST env (AST.Var id ast) = env {result=r, vars=M.insert id r (vars env)}
-  where r = result (runAST env ast)
-runAST env lambda@(AST.Lambda _ _) = env {result=lambda}
-runAST _ AST.Undefined = error "runtime: Undefined"
+            Nothing  -> AST.Undefined
+runAST' env (AST.Var id ast) = env {result=AST.Undefined, vars=vs}
+  where vs = M.insert id (result (runAST env ast)) (vars env)
+runAST' env lambda@(AST.Lambda _ _ _) = env {result=lambda}
+runAST' _ AST.Undefined = error "runtime: Undefined"
+
+runAST :: Env -> AST.AST -> Env
+runAST env@(Env {result=AST.Lambda args astL applied}) ast = env {result=r}
+  where l = AST.Lambda args astL (result (runAST' env ast) : applied)
+        r = if length applied + 1 == length args
+            then runLambda env l
+            else l
+runAST env ast = runAST' env ast
 
 run :: AST.AST -> String
 run = show . runAST defaultEnv
