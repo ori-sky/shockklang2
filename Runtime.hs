@@ -32,7 +32,7 @@ runAST' _ AST.Undefined = error "runtime: Undefined"
 
 runAST :: Env -> AST.AST -> Env
 runAST env@(Env {result=AST.Lambda args astL applied}) ast = env {result=r}
-  where l = AST.Lambda args astL (result (runAST' env ast) : applied)
+  where l = AST.Lambda args astL (result (runAST env {result=AST.Undefined} ast) : applied)
         r = if length applied + 1 == length args then runLambda env l else l
 runAST env@(Env {result=AST.Binding1 f applied}) ast = env {result=r}
   where res = result (runAST env {result=AST.Undefined} ast)

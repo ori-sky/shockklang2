@@ -1,5 +1,6 @@
 module Tokenizer
 ( Token(..)
+, isScopeEnd
 , isLambda
 , tokenize
 ) where
@@ -7,6 +8,8 @@ module Tokenizer
 import Data.Char (isSpace)
 
 data Token = Equals
+           | ScopeBegin
+           | ScopeEnd
            | Lambda
            | Number Double
            | Identifier String
@@ -23,12 +26,17 @@ dropComment (')':')':xs) = xs
 dropComment (_:xs) = xs
 dropComment "" = []
 
+isScopeEnd :: Token -> Bool
+isScopeEnd ScopeEnd = True
+isScopeEnd _ = False
 isLambda :: Token -> Bool
 isLambda Lambda = True
 isLambda _ = False
 
 tokenize :: String -> [Token]
 tokenize ('(':'(':xs) = tokenize (dropComment xs)
+tokenize ('(':xs) = ScopeBegin : tokenize xs
+tokenize (')':xs) = ScopeEnd : tokenize xs
 tokenize ('=':' ':xs) = Equals : tokenize xs
 tokenize ('\\':xs) = Lambda : tokenize xs
 tokenize "" = []

@@ -16,16 +16,17 @@ defaultScope main = AST.Scope $
       (AST.Var "true"   (AST.Boolean True))
     : (AST.Var "false"  (AST.Boolean False))
     : (AST.Var "=="     (AST.Binding2 fEq []))
+    : (AST.Var "!"      (AST.Binding1 fNot []))
     : (AST.Var "?"      (AST.Binding3 fCond []))
-    : (AST.Var "++"     (AST.Binding1 fInc []))
     : (AST.Var "+"      (AST.Binding2 fAdd []))
+    : (AST.Var "++"     (AST.Binding2 fAdd [AST.Num 1]))
     : [main]
   where fEq (AST.Num x) (AST.Num y) = AST.Boolean (x == y)
         fEq _ _ = typeError
-        fCond (AST.Boolean cond) left right = if cond then left else right
+        fNot (AST.Boolean b) = AST.Boolean (not b)
+        fNot _ = typeError
+        fCond (AST.Boolean b) left right = if b then left else right
         fCond _ _  _ = typeError
-        fInc (AST.Num x) = AST.Num (x + 1)
-        fInc _ = typeError
         fAdd (AST.Num x) (AST.Num y) = AST.Num (x + y)
         fAdd _ _ = typeError
 
