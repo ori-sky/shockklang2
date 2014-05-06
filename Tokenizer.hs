@@ -22,8 +22,8 @@ isIdentifierChar '\\' = False
 isIdentifierChar c = not (isSpace c)
 
 dropComment :: String -> String
-dropComment (')':')':xs) = xs
-dropComment (_:xs) = xs
+dropComment ('~':')':xs) = xs
+dropComment (_:xs) = dropComment xs
 dropComment "" = []
 
 isScopeEnd :: Token -> Bool
@@ -34,7 +34,7 @@ isLambda Lambda = True
 isLambda _ = False
 
 tokenize :: String -> [Token]
-tokenize ('(':'(':xs) = tokenize (dropComment xs)
+tokenize ('(':'~':xs) = tokenize (dropComment xs)
 tokenize ('(':xs) = ScopeBegin : tokenize xs
 tokenize (')':xs) = ScopeEnd : tokenize xs
 tokenize ('=':' ':xs) = Equals : tokenize xs
