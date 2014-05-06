@@ -21,7 +21,7 @@ defaultScope main = AST.Scope $
     : (AST.Var "+"      (AST.Binding2 fAdd []))
     : (AST.Var "-"      (AST.Binding2 fSub []))
     : (AST.Var "++"     (AST.Binding2 fAdd [AST.Num 1]))
-    : (AST.Var "--"     (AST.Binding2 fSub [AST.Num 1]))
+    : (AST.Var "--"     (AST.Binding2 fAdd [AST.Num (-1)]))
     : [main]
   where fEq (AST.Num x) (AST.Num y) = AST.Boolean (x == y)
         fEq _ _ = typeError
