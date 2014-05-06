@@ -40,4 +40,4 @@ tokenize s@(c:cs) = if isSpace c
         else case reads id of
             [(x, "")]  -> Number x : tokenize xs
             _         -> Identifier id : tokenize xs
-  where (id, xs) = break (not.isIdentifierChar) s
+  where (id, xs) = span isIdentifierChar s

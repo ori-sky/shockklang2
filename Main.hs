@@ -33,7 +33,7 @@ runAST env (AST.Identifier id) = env {result=r}
             Nothing  -> AST.Undefined
 runAST env (AST.Var id ast) = env {result=r, vars=M.insert id r (vars env)}
   where r = result (runAST env ast)
-runAST env AST.Undefined = env {result=AST.Undefined}
+runAST _ AST.Undefined = error "runtime: Undefined"
 
 run :: AST.AST -> String
 run = show . runAST defaultEnv
