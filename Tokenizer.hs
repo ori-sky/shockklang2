@@ -15,7 +15,6 @@ data Token = Equals
 isIdentifierChar :: Char -> Bool
 isIdentifierChar '(' = False
 isIdentifierChar ')' = False
-isIdentifierChar '=' = False
 isIdentifierChar '\\' = False
 isIdentifierChar c = not (isSpace c)
 
@@ -30,7 +29,7 @@ isLambda _ = False
 
 tokenize :: String -> [Token]
 tokenize ('(':'(':xs) = tokenize (dropComment xs)
-tokenize ('=':xs) = Equals : tokenize xs
+tokenize ('=':' ':xs) = Equals : tokenize xs
 tokenize ('\\':xs) = Lambda : tokenize xs
 tokenize "" = []
 tokenize s@(c:cs) = if isSpace c
