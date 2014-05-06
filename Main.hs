@@ -30,7 +30,7 @@ runAST env (AST.Num x) = env {result=AST.Num x}
 runAST env (AST.Identifier id) = env {result=r}
   where r = case M.lookup id (vars env) of
             Just ast -> ast
-            Nothing  -> AST.Undefined
+            Nothing  -> error "runtime: Undefined"
 runAST env (AST.Var id ast) = env {result=r, vars=M.insert id r (vars env)}
   where r = result (runAST env ast)
 runAST _ AST.Undefined = error "runtime: Undefined"
