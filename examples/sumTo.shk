@@ -1,0 +1,7 @@
+= sumTo \n\ (
+  ? (== n 0) 0 (
+    + n (sumTo (-- n))
+  )
+)
+
+sumTo 5
